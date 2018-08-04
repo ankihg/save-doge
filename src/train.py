@@ -1,10 +1,45 @@
 import extract
 import webbrowser
+import urllib3
+from bs4 import BeautifulSoup
 
+post_details = extract.query_craigslist()
 
-posts = extract.query_craigslist()
+for post_detail in post_details:
+    post = {}
+    post['url'] = post_detail['url']
+    post['id'] = post_detail['id']
+    post['name'] = post_detail['name']
+    post['where'] = post_detail['where']
+    print(post_detail)
 
-for post in posts:
-    webbrowser.open(post['url'])
+    url = post_detail['url']
+    print(url)
+    # webbrowser.open(url)
+
+    # page = urllib2.urlopen(url)
+    # soup = BeautifulSoup(page, 'html.parser')
+
+    http = urllib3.PoolManager()
+
+    response = http.request('GET', url)
+    soup = BeautifulSoup(response.data)
+
+    textEl = soup.find('section', attrs={'id': 'postingbody'})
+    print(textEl.text)
+    post['text'] = textEl.text
+
     res = input('Give me a value');
-    print(res)
+    post['isProhibited'] = res == 'y'
+
+    with open('./posts.json') as posts_json:
+        posts = json.load(posts_json)
+
+    posts.append(post)
+    with open('./posts.json', mode='w') as f:
+        f.write(json.dumps(posts, indent=2))
+
+
+
+# https://stackoverflow.com/questions/26745519/converting-dictionary-to-json-in-python
+# https://stackoverflow.com/questions/12309269/how-do-i-write-json-data-to-a-file
