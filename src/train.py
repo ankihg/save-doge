@@ -1,9 +1,17 @@
 import extract
+import learn
 import webbrowser
 import urllib3
 from bs4 import BeautifulSoup
+import json
 
 post_details = extract.query_craigslist()
+# with open('./posts.json') as posts_json:
+#     post_details = json.load(posts_json)
+
+countsByGramByProhibited = {}
+countsByGramByProhibited[True] = {}
+countsByGramByProhibited[False] = {}
 
 for post_detail in post_details:
     post = {}
@@ -32,9 +40,13 @@ for post_detail in post_details:
     res = input('Give me a value');
     post['isProhibited'] = res == 'y'
 
+    learn.handle_text(countsByGramByProhibited[post['isProhibited']], post['text'])
+
+    print(countsByGramByProhibited)
+
     with open('./posts.json') as posts_json:
         posts = json.load(posts_json)
-
+    
     posts.append(post)
     with open('./posts.json', mode='w') as f:
         f.write(json.dumps(posts, indent=2))
