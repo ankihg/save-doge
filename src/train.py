@@ -5,9 +5,9 @@ import urllib3
 from bs4 import BeautifulSoup
 import json
 
-post_details = extract.query_craigslist()
-# with open('./posts.json') as posts_json:
-#     post_details = json.load(posts_json)
+# post_details = extract.query_craigslist()
+with open('./posts.json') as posts_json:
+    post_details = json.load(posts_json)
 
 countsByGramByProhibited = {}
 countsByGramByProhibited[True] = {}
@@ -44,11 +44,11 @@ for post_detail in post_details:
 
     print(countsByGramByProhibited)
 
-    with open('./posts.json') as posts_json:
+    with open('./postsById.json') as posts_json:
         posts = json.load(posts_json)
-    
-    posts.append(post)
-    with open('./posts.json', mode='w') as f:
+
+    posts[post['id']] = post
+    with open('./postsById.json', mode='w') as f:
         f.write(json.dumps(posts, indent=2))
 
 
